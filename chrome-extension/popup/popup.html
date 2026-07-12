@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Flowora Blocker</title>
+  <style>
+    body {
+      width: 280px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 16px;
+      color: #18181b;
+    }
+    h1 { font-size: 15px; margin: 0 0 12px; }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f4f4f5;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #a1a1aa; }
+    .dot.active { background: #10b981; }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      border: 1px solid #e4e4e7;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 9px;
+      border: none;
+      border-radius: 8px;
+      background: #7c3aed;
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    button.secondary { background: transparent; color: #71717a; }
+    #error { color: #dc2626; font-size: 12px; margin-top: 6px; }
+    #logged-in-view, #login-view { display: none; }
+    a { color: #7c3aed; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Flowora — блокировщик сайтов</h1>
+
+  <div id="logged-in-view">
+    <div class="status">
+      <span class="dot" id="status-dot"></span>
+      <span id="status-text">Фокус-сессия не активна</span>
+    </div>
+    <p style="font-size:12px; color:#71717a;">
+      Списки доменов редактируются на сайте Flowora, в разделе Premium-настроек.
+    </p>
+    <a href="#" id="open-lists-link" target="_blank">Управлять списками на сайте →</a>
+    <button class="secondary" id="logout-btn" style="margin-top:12px;">Выйти</button>
+  </div>
+
+  <div id="login-view">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Пароль" />
+    <button id="login-btn">Войти</button>
+    <p id="error"></p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
