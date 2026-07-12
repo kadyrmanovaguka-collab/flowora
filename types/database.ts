@@ -93,18 +93,66 @@ export interface Achievement {
   unlocked_at: string;
 }
 
-// Минимальная форма Database-generic, которую ожидает @supabase/supabase-js
-// для типизации .from('table').select() и т.д.
+export interface BlockedDomain {
+  id: string;
+  user_id: string;
+  domain: string;
+  list_type: "blacklist" | "whitelist";
+  created_at: string;
+}
+
+export interface ActiveFocusSession {
+  user_id: string;
+  ends_at: string;
+  updated_at: string;
+}
+
+// Форма Database-generic ниже намеренно повторяет структуру, которую
+// реально ожидает @supabase/postgrest-js: каждая таблица должна иметь
+// Row/Insert/Update/Relationships, а схема — Views/Functions/Enums/
+// CompositeTypes (пусть и пустые). Без этих полей TypeScript в строгом
+// режиме (`next build`/`tsc`, но НЕ `next dev`, который не гоняет полную
+// проверку типов) может схлопнуть результат .select() в `never` —
+// именно это ловилось только на сборке в Vercel, а не локально.
+// В реальном проекте этот файл лучше генерировать командой
+//   supabase gen types typescript --project-id <id> > types/database.ts
+// вместо ручного описания — тогда такого расхождения не возникнет в принципе.
 export interface Database {
   public: {
     Tables: {
-      profiles: { Row: Profile; Insert: Partial<Profile>; Update: Partial<Profile> };
-      subscriptions: { Row: Subscription; Insert: Partial<Subscription>; Update: Partial<Subscription> };
-      projects: { Row: Project; Insert: Partial<Project>; Update: Partial<Project> };
-      tasks: { Row: Task; Insert: Partial<Task>; Update: Partial<Task> };
-      sessions: { Row: Session; Insert: Partial<Session>; Update: Partial<Session> };
-      timer_presets: { Row: TimerPreset; Insert: Partial<TimerPreset>; Update: Partial<TimerPreset> };
-      achievements: { Row: Achievement; Insert: Partial<Achievement>; Update: Partial<Achievement> };
+      profiles: { Row: Profile; Insert: Partial<Profile>; Update: Partial<Profile>; Relationships: [] };
+      subscriptions: {
+        Row: Subscription;
+        Insert: Partial<Subscription>;
+        Update: Partial<Subscription>;
+        Relationships: [];
+      };
+      projects: { Row: Project; Insert: Partial<Project>; Update: Partial<Project>; Relationships: [] };
+      tasks: { Row: Task; Insert: Partial<Task>; Update: Partial<Task>; Relationships: [] };
+      sessions: { Row: Session; Insert: Partial<Session>; Update: Partial<Session>; Relationships: [] };
+      timer_presets: {
+        Row: TimerPreset;
+        Insert: Partial<TimerPreset>;
+        Update: Partial<TimerPreset>;
+        Relationships: [];
+      };
+      achievements: { Row: Achievement; Insert: Partial<Achievement>; Update: Partial<Achievement>; Relationships: [] };
+      blocked_domains: {
+        Row: BlockedDomain;
+        Insert: Partial<BlockedDomain>;
+        Update: Partial<BlockedDomain>;
+        Relationships: [];
+      };
+      active_focus_sessions: {
+        Row: ActiveFocusSession;
+        Insert: Partial<ActiveFocusSession>;
+        Update: Partial<ActiveFocusSession>;
+        Relationships: [];
+      };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }

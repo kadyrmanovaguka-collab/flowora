@@ -12,7 +12,7 @@ export async function migrateGuestDataIfNeeded(userId: string): Promise<void> {
     .from("profiles")
     .select("guest_data_migrated")
     .eq("id", userId)
-    .single();
+    .single<{ guest_data_migrated: boolean }>();
 
   if (!profile || profile.guest_data_migrated) return;
 

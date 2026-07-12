@@ -53,7 +53,8 @@ export default async function DashboardPage() {
   const { data: unlockedAchievements } = await supabase
     .from("achievements")
     .select("achievement_key")
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .returns<{ achievement_key: string }[]>();
 
   const currentStreak = computeStreakFromDates(rows.map((r) => r.started_at.slice(0, 10)));
 

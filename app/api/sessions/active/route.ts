@@ -17,7 +17,10 @@ export async function GET(request: Request) {
   // RLS-политика active_focus_sessions_select_own гарантирует, что чужую
   // строку прочитать невозможно, даже если бы в этом коде была ошибка —
   // единственный источник user_id здесь — это auth.uid() из самого токена.
-  const { data, error } = await supabase.from("active_focus_sessions").select("ends_at").maybeSingle();
+  const { data, error } = await supabase
+    .from("active_focus_sessions")
+    .select("ends_at")
+    .maybeSingle<{ ends_at: string }>();
 
   if (error) {
     // Невалидный/просроченный токен обычно всплывает здесь как ошибка

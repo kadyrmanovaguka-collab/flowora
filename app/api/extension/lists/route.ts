@@ -14,7 +14,10 @@ export async function GET(request: Request) {
 
   const supabase = createTokenClient(token);
 
-  const { data, error } = await supabase.from("blocked_domains").select("domain, list_type");
+  const { data, error } = await supabase
+    .from("blocked_domains")
+    .select("domain, list_type")
+    .returns<{ domain: string; list_type: "blacklist" | "whitelist" }[]>();
 
   if (error) {
     return NextResponse.json({ error: "Не удалось загрузить списки" }, { status: 401 });

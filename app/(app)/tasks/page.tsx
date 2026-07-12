@@ -23,7 +23,12 @@ export default async function TasksPage() {
     // Считаем, сколько ЗАВЕРШЁННЫХ focus-сессий приходится на каждую задачу —
     // группировку делаем в JS, а не в SQL, чтобы не усложнять миграцию
     // отдельной view ради одной страницы.
-    supabase.from("sessions").select("task_id").eq("type", "focus").eq("completed", true),
+    supabase
+      .from("sessions")
+      .select("task_id")
+      .eq("type", "focus")
+      .eq("completed", true)
+      .returns<{ task_id: string | null }[]>(),
   ]);
 
   const spentByTask = new Map<string, number>();

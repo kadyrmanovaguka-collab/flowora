@@ -49,14 +49,19 @@ export async function checkAndUnlockAchievements(userId: string): Promise<void> 
       .select("started_at")
       .eq("user_id", userId)
       .eq("type", "focus")
-      .eq("completed", true),
+      .eq("completed", true)
+      .returns<{ started_at: string }[]>(),
     supabase
       .from("sessions")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
       .eq("type", "focus")
       .eq("completed", true),
-    supabase.from("achievements").select("achievement_key").eq("user_id", userId),
+    supabase
+      .from("achievements")
+      .select("achievement_key")
+      .eq("user_id", userId)
+      .returns<{ achievement_key: string }[]>(),
   ]);
 
   const streak = computeStreakFromDates((sessionDates ?? []).map((r) => r.started_at.slice(0, 10)));
