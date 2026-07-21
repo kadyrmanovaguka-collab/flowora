@@ -1,5 +1,4 @@
 import { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "@/types/database";
 
 // Клиент для Client Components ("use client").
 // Использует NEXT_PUBLIC_* переменные — они безопасны в браузере, потому что
@@ -10,9 +9,15 @@ import type { Database } from "@/types/database";
 // вызываться на каждый рендер в контексте, где доступен document/cookies —
 // создание один раз на уровне модуля иногда приводит к рассинхронизации
 // сессии между вкладками.
+//
+// Без generic-параметра <Database> намеренно: вручную написанный тип базы
+// не всегда точно совпадает по внутренней форме с тем, что ожидает
+// конкретная версия @supabase/postgrest-js, и такое расхождение иногда
+// схлопывает результат .select()/.insert() в `never` только на строгой
+// сборке (next build), но не на next dev — трудноуловимо и хрупко.
+// Типизация результатов чтения задаётся точечно через .returns<T>() в
+// каждом запросе, а для записи используются обычные объекты, типизированные
+// интерфейсами из types/database.ts на стороне вызывающего кода.
 export function createClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 }
