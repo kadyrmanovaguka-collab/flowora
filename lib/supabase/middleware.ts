@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Вынесено в отдельный файл, потому что этот код используется ИСКЛЮЧИТЕЛЬНО
@@ -10,6 +10,10 @@ import { NextResponse, type NextRequest } from "next/server";
 // разлогиниваться каждый час несмотря на то, что refresh token валиден.
 // Этот хелпер вызывается в middleware.ts на каждый запрос к /app/* и
 // прозрачно продлевает сессию, записывая обновлённые cookies в response.
+//
+// Без generic-параметра <Database> у createServerClient (см. объяснение в
+// lib/supabase/client.ts) — но это убирает и автоматический вывод типа
+// параметра cookiesToSet в колбэке setAll, поэтому тип указан явно вручную.
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -21,12 +25,10 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
     }
@@ -36,7 +38,9 @@ export async function updateSession(request: NextRequest) {
   // к Supabase Auth серверу и проверяет токен, а не просто читает то, что
   // лежит в cookie. Это важно на защищённых роутах — иначе можно было бы
   // подделать cookie с "валидной на вид" сессией без реальной проверки.
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return { response, user };
 }
