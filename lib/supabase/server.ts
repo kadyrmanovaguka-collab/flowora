@@ -12,10 +12,9 @@ import { cookies } from "next/headers";
 // операций, которые должны обходить RLS — для этого есть отдельный
 // createServiceRoleClient ниже.
 //
-// Без generic-параметра <Database> — см. подробное объяснение в
-// lib/supabase/client.ts: вручную написанный тип базы не всегда точно
-// совпадает по форме с ожиданиями конкретной версии @supabase/postgrest-js
-// и провоцирует ложные ошибки типов только на строгой сборке.
+// Без generic-параметра <Database>: вручную написанный тип базы не всегда
+// точно совпадает по форме с ожиданиями конкретной версии
+// @supabase/postgrest-js и провоцирует ложные ошибки типов на строгой сборке.
 export async function createClient() {
   const cookieStore = await cookies();
 
@@ -24,11 +23,9 @@ export async function createClient() {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
         try {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options as CookieOptions)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
         } catch {
           // setAll вызывается из Server Component, где нельзя писать cookies
           // (только из Server Action / Route Handler / middleware).
